@@ -1,3 +1,27 @@
+//input with id='username" on change event
+document.getElementById('username').addEventListener('input', function () {
+    var username = document.getElementById('username').value;
+    var regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    var validationElem = document.getElementById('username-validation');
+    if (regex.test(username)) {
+        document.getElementById('username').classList.remove('is-invalid');
+        document.getElementById('username').classList.add('is-valid');
+        if (validationElem) {
+            validationElem.style.display = 'none';
+            validationElem.textContent = '';
+        }
+    } else {
+        document.getElementById('username').classList.remove('is-valid');
+        document.getElementById('username').classList.add('is-invalid');
+        if (validationElem) {
+            validationElem.style.display = 'block';
+            validationElem.textContent = 'Username must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character.';
+        }
+    }
+})
+
+
+
 document.addEventListener('DOMContentLoaded', function () {
     var chartInitialized = false;
     var chartInstance = null;
