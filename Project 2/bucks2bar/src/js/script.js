@@ -1,71 +1,88 @@
-//input with id='username" on change event
-document.getElementById('username').addEventListener('input', function () {
-    var username = document.getElementById('username').value;
-    var regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    var validationElem = document.getElementById('username-validation');
-    if (regex.test(username)) {
-        document.getElementById('username').classList.remove('is-invalid');
-        document.getElementById('username').classList.add('is-valid');
+// ...existing code...
+
+document.getElementById('sendEmailBtn').addEventListener('click', async () => {
+    const email = document.getElementById('emailInput').value;
+    const canvas = document.getElementById('barChart');
+    if (!canvas || !email) return alert('Please enter a valid email and generate the chart first.');
+    const image = canvas.toDataURL('image/png');
+    const response = await fetch('http://localhost:3000/send-chart-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, image })
+    });
+    if (response.ok) {
+        alert('Chart sent to your email!');
+    } else {
+        alert('Failed to send email.');
+    }
+});
+
+// ...existing code...
+// Username validation with Bootstrap feedback
+const usernameInput = document.getElementById('username');
+const validationElem = document.getElementById('username-validation');
+const usernameRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+usernameInput.addEventListener('input', () => {
+    const username = usernameInput.value;
+    if (usernameRegex.test(username)) {
+        usernameInput.classList.remove('is-invalid');
+        usernameInput.classList.add('is-valid');
         if (validationElem) {
             validationElem.style.display = 'none';
             validationElem.textContent = '';
         }
     } else {
-        document.getElementById('username').classList.remove('is-valid');
-        document.getElementById('username').classList.add('is-invalid');
+        usernameInput.classList.remove('is-valid');
+        usernameInput.classList.add('is-invalid');
         if (validationElem) {
             validationElem.style.display = 'block';
             validationElem.textContent = 'Username must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character.';
         }
     }
-})
+});
 
+document.addEventListener('DOMContentLoaded', () => {
+    let chartInstance = null;
+    let chartInitialized = false;
 
-
-document.addEventListener('DOMContentLoaded', function () {
-    var chartInitialized = false;
-    var chartInstance = null;
+    const months = [
+        'january', 'february', 'march', 'april', 'may', 'june',
+        'july', 'august', 'september', 'october', 'november', 'december'
+    ];
 
     // Helper: Read all input fields and return data object
-    function getMonthlyIncomeExpenses() {
-        const months = [
-            'january', 'february', 'march', 'april', 'may', 'june',
-            'july', 'august', 'september', 'october', 'november', 'december'
-        ];
+    const getMonthlyIncomeExpenses = () => {
         const data = {};
         months.forEach(month => {
-            const income = parseFloat(document.getElementById(`income-${month}`).value) || 0;
-            const expenses = parseFloat(document.getElementById(`expenses-${month}`).value) || 0;
+            const income = parseFloat(document.getElementById(`income-${month}`)?.value) || 0;
+            const expenses = parseFloat(document.getElementById(`expenses-${month}`)?.value) || 0;
             data[month] = { income, expenses };
         });
         return data;
-    }
+    };
 
     // Chart update helper
-    function updateChartData(chartInstance) {
+    const updateChartData = chart => {
         const monthlyData = getMonthlyIncomeExpenses();
-        const months = [
-            'january', 'february', 'march', 'april', 'may', 'june',
-            'july', 'august', 'september', 'october', 'november', 'december'
-        ];
         const incomeData = months.map(m => monthlyData[m].income);
         const expensesData = months.map(m => monthlyData[m].expenses);
-        chartInstance.data.datasets[0].data = incomeData;
-        chartInstance.data.datasets[1].data = expensesData;
-        chartInstance.update();
-    }
+        chart.data.datasets[0].data = incomeData;
+        chart.data.datasets[1].data = expensesData;
+        chart.update();
+    };
 
     // Handle chart tab click
-    document.getElementById('chart-tab').addEventListener('click', function () {
-        setTimeout(function () {
+    document.getElementById('chart-tab').addEventListener('click', () => {
+        setTimeout(() => {
             if (!chartInitialized) {
-                var ctx = document.getElementById('barChart');
-                if (!ctx) return;
-                ctx = ctx.getContext('2d');
+                const ctxElem = document.getElementById('barChart');
+                if (!ctxElem) return;
+                const ctx = ctxElem.getContext('2d');
                 chartInstance = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                        labels: months.map(m => m.charAt(0).toUpperCase() + m.slice(1)),
                         datasets: [
                             {
                                 label: 'Income',
@@ -89,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 chartInitialized = true;
             }
-            // Always update chart data on tab click
             if (chartInstance) {
                 updateChartData(chartInstance);
             }
@@ -97,32 +113,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Add listeners to update chart when inputs change (if chart is visible)
-    function addInputListeners() {
-        const months = [
-            'january', 'february', 'march', 'april', 'may', 'june',
-            'july', 'august', 'september', 'october', 'november', 'december'
-        ];
+    const addInputListeners = () => {
         months.forEach(month => {
             const incomeInput = document.getElementById(`income-${month}`);
             const expensesInput = document.getElementById(`expenses-${month}`);
-            if (incomeInput) {
-                incomeInput.addEventListener('input', () => {
-                    if (chartInstance) updateChartData(chartInstance);
-                });
-            }
-            if (expensesInput) {
-                expensesInput.addEventListener('input', () => {
-                    if (chartInstance) updateChartData(chartInstance);
-                });
-            }
+            incomeInput?.addEventListener('input', () => {
+                if (chartInstance) updateChartData(chartInstance);
+            });
+            expensesInput?.addEventListener('input', () => {
+                if (chartInstance) updateChartData(chartInstance);
+            });
         });
-    }
+    };
 
     addInputListeners();
 });
 
-document.getElementById('downloadBtn').addEventListener('click', function () {
+// Download chart as image
+document.getElementById('downloadBtn').addEventListener('click', () => {
     const canvas = document.getElementById('barChart');
+    if (!canvas) return;
     const image = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.href = image;
