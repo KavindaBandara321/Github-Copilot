@@ -1,0 +1,9 @@
+{
+    "Prompt to generate dummy data":{
+        "prefix" : "dummy",
+        "description":"Generate dummy data",
+        "body" : [
+            "// An array of ${1: number_of_items} ${2:data+_type} with the following properties : ${3:fields}"
+        ]
+    }
+}
