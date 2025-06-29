@@ -1,1 +1,5 @@
 This Repo teaches you about GitHub Copilot, an AI-powered coding tool that helps developers write code faster and more efficiently. It offers advanced machine learning algorithms that suggest code snippets and functions based on your code context, making it easier to write clean, concise, and bug-free code. The course covers installation, usage, generation of code snippets, unit tests, and commit messages. It is divided into three main sections: creating a real-world project called "Bucks2Bar" using GitHub Copilot and GitHub Copilot chat, learning about GitHub Copilot Chat features, and generating server-side code for the Bucks2Bar project. A self-contained mini course covers GitHub Copilot for React JS development, focusing on generating TypeScript code with React, creating unit tests, and validation. The course provides practical examples and real-world scenarios to help you master GitHub Copilot and improve your coding productivity.
+
+**Help command**
+
+![image](https://github.com/user-attachments/assets/fe02ea9f-1b67-4733-9bf2-33255ddb8207)
