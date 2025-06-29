@@ -17,6 +17,35 @@ document.getElementById('sendEmailBtn').addEventListener('click', async () => {
     }
 });
 
+// for (let i = 0; i < array.length; i++) {
+//     const element = array[i];
+//     index
+// }
+
+
+// const cars = [
+//     { id: 1, manufacturer: 'Toyota', model: 'Camry', year: 2020, price: 24000 },
+//     { id: 2, manufacturer: 'Honda', model: 'Accord', year: 2019, price: 22000 },
+//     { id: 3, manufacturer: 'Ford', model: 'Mustang', year: 2021, price: 35000 },
+//     { id: 4, manufacturer: 'Chevrolet', model: 'Malibu', year: 2018, price: 18000 },
+//     { id: 5, manufacturer: 'Tesla', model: 'Model 3', year: 2022, price: 42000 },
+//     { id: 6, manufacturer: 'BMW', model: '3 Series', year: 2020, price: 41000 },
+//     { id: 7, manufacturer: 'Audi', model: 'A4', year: 2019, price: 39000 },
+//     { id: 8, manufacturer: 'Hyundai', model: 'Elantra', year: 2021, price: 20000 },
+//     { id: 9, manufacturer: 'Kia', model: 'Optima', year: 2018, price: 17000 },
+//     { id: 10, manufacturer: 'Nissan', model: 'Altima', year: 2022, price: 25000 }
+// ];
+
+
+// An array of 10 cars with the following properties : Type, Manufacturer, Model, Year, Price
+// const cars = [
+//     { type: 'Sedan', manufacturer: 'Toyota', model: 'Camry', year: 2020, price: 24000 },
+//     { type: 'Sedan', manufacturer: 'Honda', model: 'Accord', year: 2019, price: 22000 },
+//     { type: 'Coupe', manufacturer: 'Ford', model: 'Mustang', year: 2021, price: 35000 },
+//     { type: 'Sedan', manufacturer: 'Chevrolet', model: 'Mal  ibu', year: 2018, price: 18000 },
+//     { type: 'Electric', manufacturer: 'Tesla', model: 'Model 3', year: 2022, price: 42000 },
+//     { type: 'Sedan', manufacturer: 'BMW', model: '3 Series', year: 2020, price: 41000 },
+
 // ...existing code...
 // Username validation with Bootstrap feedback
 const usernameInput = document.getElementById('username');
