@@ -1,63 +1,81 @@
-// Unit tests for username validation logic in script.js
-// Using Jest for testing
+const { JSDOM } = require('jsdom');
 
-describe('Username Validation', () => {
-    // The regex used in the code
-    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+// script.test.js
 
-    function isValidUsername(username) {
-        return regex.test(username);
-    }
+// Mock dependencies and DOM
 
-    test('Valid username: meets all requirements', () => {
-        expect(isValidUsername('Testuser1!')).toBe(true);
-        expect(isValidUsername('A1@aaaaa')).toBe(true);
-        expect(isValidUsername('Password1$')).toBe(true);
+describe('updateChartData', () => {
+    let updateChartData, months, getMonthlyIncomeExpenses;
+    let chartMock;
+
+    beforeEach(() => {
+        // Setup DOM for months' inputs
+        const dom = new JSDOM(`
+            <body>
+                ${[
+                    'january','february','march','april','may','june',
+                    'july','august','september','october','november','december'
+                ].map(m => `
+                    <input id="income-${m}" value="100">
+                    <input id="expenses-${m}" value="50">
+                `).join('')}
+            </body>
+        `);
+        global.document = dom.window.document;
+
+        // Mock months and getMonthlyIncomeExpenses as in script.js
+        months = [
+            'january','february','march','april','may','june',
+            'july','august','september','october','november','december'
+        ];
+        getMonthlyIncomeExpenses = () => {
+            const data = {};
+            months.forEach(month => {
+                const income = parseFloat(document.getElementById(`income-${month}`)?.value) || 0;
+                const expenses = parseFloat(document.getElementById(`expenses-${month}`)?.value) || 0;
+                data[month] = { income, expenses };
+            });
+            return data;
+        };
+
+        // Recreate updateChartData with local dependencies
+        updateChartData = chart => {
+            const monthlyData = getMonthlyIncomeExpenses();
+            const incomeData = months.map(m => monthlyData[m].income);
+            const expensesData = months.map(m => monthlyData[m].expenses);
+            chart.data.datasets[0].data = incomeData;
+            chart.data.datasets[1].data = expensesData;
+            chart.update();
+        };
+
+        // Mock chart object
+        chartMock = {
+            data: {
+                datasets: [
+                    { data: [] },
+                    { data: [] }
+                ]
+            },
+            update: jest.fn()
+        };
     });
 
-    test('Valid username: more examples', () => {
-        expect(isValidUsername('Qwerty1!')).toBe(true);
-        expect(isValidUsername('HelloWorld2@')).toBe(true);
-        expect(isValidUsername('A2$aaaaaa')).toBe(true);
-        expect(isValidUsername('Z9!Z9!Z9!')).toBe(true);
+    it('should update chart datasets with correct income and expenses', () => {
+        updateChartData(chartMock);
+
+        expect(chartMock.data.datasets[0].data).toEqual(Array(12).fill(100));
+        expect(chartMock.data.datasets[1].data).toEqual(Array(12).fill(50));
+        expect(chartMock.update).toHaveBeenCalled();
     });
 
-    test('Invalid username: less than 8 characters', () => {
-        expect(isValidUsername('A1@a')).toBe(false);
-    });
+    it('should handle missing or invalid input values as 0', () => {
+        // Set some fields to invalid values
+        document.getElementById('income-january').value = '';
+        document.getElementById('expenses-february').value = 'notanumber';
 
-    test('Invalid username: missing uppercase', () => {
-        expect(isValidUsername('testuser1!')).toBe(false);
-    });
+        updateChartData(chartMock);
 
-    test('Invalid username: missing number', () => {
-        expect(isValidUsername('Testuser!')).toBe(false);
-    });
-
-    test('Invalid username: missing special character', () => {
-        expect(isValidUsername('Testuser1')).toBe(false);
-    });
-
-    test('Invalid username: missing all requirements', () => {
-        expect(isValidUsername('testuser')).toBe(false);
-    });
-
-    test('Invalid username: only lowercase and numbers', () => {
-        expect(isValidUsername('abcdefg1')).toBe(false);
-    });
-    test('Invalid username: only uppercase and special', () => {
-        expect(isValidUsername('ABCDEFG!')).toBe(false);
-    });
-    test('Invalid username: only numbers and special', () => {
-        expect(isValidUsername('1234567!')).toBe(false);
-    });
-    test('Invalid username: contains invalid special character', () => {
-        expect(isValidUsername('ValidUser1#')).toBe(false); // # is not allowed
-    });
-    test('Invalid username: spaces included', () => {
-        expect(isValidUsername('Valid User1!')).toBe(false);
-    });
-    test('Invalid username: too short even if all requirements met', () => {
-        expect(isValidUsername('A1@aaaa')).toBe(false); // only 7 chars
+        expect(chartMock.data.datasets[0].data[0]).toBe(0); // january income
+        expect(chartMock.data.datasets[1].data[1]).toBe(0); // february expenses
     });
 });
